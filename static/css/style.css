@@ -1,0 +1,435 @@
+/* ============================================
+   دیجی‌کالا - استایل کامل
+   ============================================ */
+
+/* ---------- Reset & Base ---------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f8f9fa;
+    color: #222;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.6;
+}
+
+/* ---------- Container ---------- */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* ---------- Navbar ---------- */
+.navbar {
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 12px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.logo {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #ef4056;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo:hover {
+    color: #d63a4e;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.nav-right a,
+.nav-right span {
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+
+.nav-right a:hover {
+    color: #ef4056;
+}
+
+.nav-right .btn-nav {
+    background: #ef4056;
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.nav-right .btn-nav:hover {
+    background: #d63a4e;
+    color: #fff;
+}
+
+/* ---------- Search Form ---------- */
+.search-form {
+    flex: 1;
+    max-width: 450px;
+    display: flex;
+    gap: 6px;
+    margin: 0 15px;
+}
+
+.search-form input {
+    flex: 1;
+    padding: 8px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border 0.3s;
+}
+
+.search-form input:focus {
+    border-color: #ef4056;
+}
+
+.search-form button {
+    background: #ef4056;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.search-form button:hover {
+    background: #d63a4e;
+}
+
+/* ---------- Main Content ---------- */
+main.container {
+    flex: 1;
+    padding: 30px 0;
+}
+
+/* ---------- Cards ---------- */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    padding: 16px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #f5f5f5;
+}
+
+.card h3 {
+    font-size: 1.05rem;
+    margin: 10px 0 6px;
+    color: #222;
+}
+
+.card h4 {
+    font-size: 1rem;
+    margin: 8px 0 4px;
+    color: #222;
+}
+
+.card p {
+    color: #555;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.card .meta {
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.card .price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 8px 0 12px;
+}
+
+.card .price {
+    font-weight: 700;
+    color: #ef4056;
+    font-size: 1.1rem;
+}
+
+.card .stock-badge {
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: #e8f7ee;
+    color: #22a958;
+}
+
+.card .stock-badge.out {
+    background: #fff0f1;
+    color: #ef4056;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+    display: inline-block;
+    background: #0077cc;
+    color: #fff;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.1s;
+    text-align: center;
+}
+
+.btn:hover {
+    background: #005fa3;
+    transform: scale(1.02);
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+.btn-success {
+    background: #22a958;
+}
+
+.btn-success:hover {
+    background: #1a8a47;
+}
+
+.btn-danger {
+    background: #ef4056;
+}
+
+.btn-danger:hover {
+    background: #d63a4e;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid #0077cc;
+    color: #0077cc;
+}
+
+.btn-outline:hover {
+    background: #0077cc;
+    color: #fff;
+}
+
+.btn:disabled {
+    background: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ---------- Forms ---------- */
+.auth-form {
+    max-width: 400px;
+    margin: 20px auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: border 0.3s;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #ef4056;
+    outline: none;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* ---------- Tables ---------- */
+.cart-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.cart-table th,
+.cart-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+}
+
+.cart-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #555;
+}
+
+.cart-table tr:hover {
+    background: #fafafa;
+}
+
+/* ---------- Messages ---------- */
+.messages {
+    margin: 10px 0;
+}
+
+.message {
+    padding: 10px 16px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.message.warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.message.info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* ---------- Footer ---------- */
+.footer {
+    background: #fff;
+    text-align: center;
+    padding: 20px 0;
+    border-top: 1px solid #eee;
+    color: #777;
+    font-size: 0.9rem;
+    margin-top: 40px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+    .navbar .container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .search-form {
+        max-width: 100%;
+        width: 100%;
+        margin: 0;
+    }
+
+    .nav-right {
+        justify-content: center;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .card-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .card img {
+        height: 130px;
+    }
+}

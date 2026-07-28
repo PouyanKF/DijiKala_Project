@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}حذف کد تخفیف | دیجی‌کالا{% endblock %}
+
+{% block content %}
+<div style="max-width:500px; margin:40px auto; text-align:center; direction:rtl;">
+    <div style="background:#fff; padding:30px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        <h2 style="color:#ef4056;">⚠️ تأیید حذف</h2>
+        <p style="font-size:1.1rem; margin:20px 0;">
+            آیا از حذف کد تخفیف <strong style="color:#ef4056;">"{{ coupon.code }}"</strong> مطمئن هستید؟
+        </p>
+        <p style="color:#666; font-size:0.9rem;">این عمل غیرقابل بازگشت است.</p>
+
+        <form method="post" style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+            {% csrf_token %}
+            <button type="submit" class="btn" style="background:#ef4056; padding:10px 30px; border:none; border-radius:6px; color:#fff; cursor:pointer;">🗑️ بله، حذف کن</button>
+            <a href="{% url 'store:coupon_list' %}" class="btn" style="background:#666; padding:10px 30px; border:none; border-radius:6px; color:#fff; text-decoration:none; cursor:pointer;">لغو</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}حذف محصول | دیجی‌کالا{% endblock %}
+
+{% block content %}
+<div style="max-width:500px; margin:40px auto; text-align:center; direction:rtl;">
+
+    <div style="background:#fff; padding:30px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        <h2 style="color:#ef4056;">⚠️ تأیید حذف</h2>
+        <p style="font-size:1.1rem; margin:20px 0;">
+            آیا از حذف محصول 
+            <strong style="color:#ef4056;">"{{ product.title }}"</strong> 
+            مطمئن هستید؟
+        </p>
+        <p style="color:#666; font-size:0.9rem;">این عمل غیرقابل بازگشت است.</p>
+
+        <form method="post" style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+            {% csrf_token %}
+            <button type="submit" class="btn" style="background:#ef4056; padding:10px 30px;">🗑️ بله، حذف کن</button>
+            <a href="{% url 'store:seller_products' %}" class="btn" style="background:#666; padding:10px 30px;">لغو</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

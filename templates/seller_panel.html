@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}پنل فروشنده | دیجی‌کالا{% endblock %}
+
+{% block content %}
+<div style="text-align:right; direction:rtl;">
+    <h2 style="color:#333; margin-bottom:20px;">👨‍💼 پنل فروشنده</h2>
+
+    <!-- کارت‌های سریع -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:15px; margin-bottom:25px;">
+        <div style="background:#fff; padding:15px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); text-align:center;">
+            <span style="font-size:2rem;">🏪</span>
+            <p style="margin:5px 0 0; font-weight:bold;">{{ stores|length }}</p>
+            <p style="font-size:0.8rem; color:#666;">فروشگاه</p>
+        </div>
+        <div style="background:#fff; padding:15px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); text-align:center;">
+            <span style="font-size:2rem;">📦</span>
+            <p style="margin:5px 0 0; font-weight:bold;">{{ total_products|default:0 }}</p>
+            <p style="font-size:0.8rem; color:#666;">محصول</p>
+        </div>
+        <div style="background:#fff; padding:15px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); text-align:center;">
+            <span style="font-size:2rem;">💰</span>
+            <p style="margin:5px 0 0; font-weight:bold;">{{ user.balance|default:0 }}</p>
+            <p style="font-size:0.8rem; color:#666;">موجودی کیف پول</p>
+        </div>
+    </div>
+
+    <!-- لینک‌های مدیریت -->
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:25px;">
+        <a href="{% url 'store:add_product' %}" class="btn" style="background:#22a958; padding:10px 20px;">➕ افزودن محصول</a>
+        <a href="{% url 'store:seller_products' %}" class="btn" style="background:#0077cc; padding:10px 20px;">📦 مدیریت محصولات</a>
+        <a href="{% url 'store:coupon_list' %}" class="btn" style="background:#f39c12; padding:10px 20px;">🎟️ کدهای تخفیف</a>
+        <a href="{% url 'store:wallet' %}" class="btn" style="background:#8e44ad; padding:10px 20px;">💰 کیف پول</a>
+    </div>
+
+    <hr style="border:0; border-top:1px solid #eee; margin:30px 0;">
+
+    <!-- فرم ساخت فروشگاه -->
+    <div style="background:#fff; padding:20px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); max-width:500px; margin-bottom:30px;">
+        <h3 style="color:#ef4056; margin-bottom:15px;">🏪 ساخت فروشگاه جدید</h3>
+        <form method="post" action="{% url 'store:create_store' %}">
+            {% csrf_token %}
+            <div class="form-group" style="margin-bottom:15px;">
+                <label style="display:block; font-weight:600; margin-bottom:5px;">نام فروشگاه</label>
+                <input type="text" name="name" placeholder="مثلاً: فروشگاه دیجیتال علی" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px;">
+            </div>
+            <div class="form-group" style="margin-bottom:15px;">
+                <label style="display:block; font-weight:600; margin-bottom:5px;">توضیحات</label>
+                <textarea name="description" placeholder="توضیحات فروشگاه..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; height:80px; resize:vertical;"></textarea>
+            </div>
+            <button type="submit" class="btn" style="width:100%; padding:10px; background:#0077cc; font-weight:bold; border:none; border-radius:6px; color:#fff; cursor:pointer;">🚀 ثبت فروشگاه</button>
+        </form>
+    </div>
+
+    <hr style="border:0; border-top:1px solid #eee; margin:30px 0;">
+
+    <h3 style="margin-bottom:15px;">🏪 فروشگاه‌های من</h3>
+    <div class="card-grid">
+        {% for store in stores %}
+            <div class="card" style="display:flex; flex-direction:column; justify-content:space-between; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.05); padding:15px;">
+                <div>
+                    <h4>{{ store.name }}</h4>
+                    <p style="color:#666; font-size:0.9rem;">{{ store.description|default:"توضیحاتی ثبت نشده" }}</p>
+                </div>
+                <div style="display:flex; gap:5px; margin-top:10px;">
+                    <a href="{% url 'store:add_product' %}" class="btn" style="background:#22a958; flex:1; text-align:center; padding:6px; font-size:0.85rem; border:none; border-radius:6px; color:#fff; text-decoration:none;">📦 افزودن محصول</a>
+                    <a href="{% url 'store:seller_products' %}" class="btn" style="background:#0077cc; flex:1; text-align:center; padding:6px; font-size:0.85rem; border:none; border-radius:6px; color:#fff; text-decoration:none;">مدیریت</a>
+                </div>
+            </div>
+        {% empty %}
+            <div style="grid-column:1/-1; text-align:center; padding:30px; background:#fff; border-radius:12px; border:1px dashed #ccc; color:#888;">
+                هنوز فروشگاهی ایجاد نکرده‌اید!
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

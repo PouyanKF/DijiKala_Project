@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}سبد خرید | دیجی‌کالا{% endblock %}
+
+{% block content %}
+<h2 style="text-align:right;">🛒 سبد خرید</h2>
+
+{% if cart_items %}
+    <table style="width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.05); text-align:right;">
+        <thead style="background:#f1f1f1;">
+            <tr>
+                <th style="padding:12px;">محصول</th>
+                <th style="padding:12px;">تعداد</th>
+                <th style="padding:12px;">قیمت (تومان)</th>
+                <th style="padding:12px;">جمع</th>
+                <th style="padding:12px;">حذف</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+                <tr style="border-bottom:1px solid #eee;">
+                    <td style="padding:12px;">
+                        <a href="{% url 'store:product_detail' item.product.id %}" style="text-decoration:none; color:#333;">{{ item.product.title }}</a>
+                    </td>
+                    <td style="padding:12px;">{{ item.quantity }}</td>
+                    <td style="padding:12px;">{{ item.product.price }}</td>
+                    <!-- ✅ استفاده از متد total_price در مدل -->
+                    <td style="padding:12px; font-weight:bold;">{{ item.total_price }}</td>
+                    <td style="padding:12px;">
+                        <a href="{% url 'store:remove_from_cart' item.id %}" style="color:#ef4056; text-decoration:none; font-weight:bold;">❌ حذف</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; padding:15px; border-radius:12px; margin-top:20px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        <span style="font-weight:bold; font-size:1.2rem;">جمع کل: {{ total }} تومان</span>
+        <a href="{% url 'store:payment' %}" class="btn" style="padding:10px 25px; background:#22a958; color:#fff; text-decoration:none; border-radius:6px;">✅ تسویه حساب</a>
+    </div>
+
+{% else %}
+    <div style="text-align:center; padding:40px; background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        <p style="font-size:1.2rem; color:#666;">سبد خرید شما خالی است!</p>
+        <a href="{% url 'store:home' %}" class="btn" style="display:inline-block; margin-top:15px; padding:8px 20px; background:#0077cc; color:#fff; text-decoration:none; border-radius:6px;">بازگشت به فروشگاه</a>
+    </div>
+{% endif %}
+{% endblock %}

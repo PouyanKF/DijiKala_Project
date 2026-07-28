@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.title }} | دیجی‌کالا{% endblock %}
+
+{% block content %}
+<div style="max-width:800px; margin:0 auto; text-align:right; direction:rtl;">
+    <div style="background:#fff; padding:25px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        <div style="display:flex; gap:25px; flex-wrap:wrap;">
+            <div style="flex:1; min-width:250px;">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.title }}" style="width:100%; max-height:400px; object-fit:contain; border-radius:8px;">
+                {% else %}
+                    <div style="width:100%; height:300px; background:#f5f5f5; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#aaa;">بدون تصویر</div>
+                {% endif %}
+            </div>
+            <div style="flex:1; min-width:250px;">
+                <h2 style="margin-top:0;">{{ product.title }}</h2>
+                <p style="color:#666; font-size:1.1rem; margin:15px 0;">{{ product.description }}</p>
+                <p><strong>دسته‌بندی:</strong> {{ product.category.title }}</p>
+                <p><strong>فروشنده:</strong> {{ product.seller.username }}</p>
+                <p><strong>قیمت:</strong> <span style="font-size:1.5rem; color:#ef4056;">{{ product.price }} تومان</span></p>
+                <p><strong>موجودی:</strong> 
+                    {% if product.stock > 0 %}
+                        <span style="color:#22a958;">{{ product.stock }} عدد</span>
+                    {% else %}
+                        <span style="color:#ef4056;">اتمام موجودی</span>
+                    {% endif %}
+                </p>
+                
+                {% if user.is_authenticated and product.stock > 0 and user.role == 'CUSTOMER' %}
+                    <a href="{% url 'store:add_to_cart' product.id %}" class="btn" style="display:inline-block; padding:10px 25px; background:#ef4056; color:#fff; text-decoration:none; border-radius:6px; font-weight:bold;">➕ افزودن به سبد خرید</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

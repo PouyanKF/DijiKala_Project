@@ -1,0 +1,338 @@
+{% extends 'base.html' %}
+{% block title %}پرداخت | دیجی‌کالا{% endblock %}
+
+{% block content %}
+<div style="max-width:500px; margin:40px auto; text-align:center;">
+
+    {% if success %}
+        <div style="background:#fff; padding:30px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); border-top:4px solid #22a958;">
+            <h2 style="color:#22a958;">✅ پرداخت موفق</h2>
+            <p style="font-size:1.1rem; color:#333;">سفارش شما با موفقیت ثبت شد. ممنون از خرید شما! ❤️</p>
+            <p style="color:#666;">روش پرداخت: {{ payment_method|default:"کارت" }}</p>
+            {% if discount > 0 %}
+                <p style="color:#666;">مبلغ اصلی: {{ total }} تومان</p>
+                <p style="color:#22a958;">تخفیف: -{{ discount }} تومان</p>
+            {% endif %}
+            <p style="font-weight:bold; font-size:1.2rem;">مبلغ پرداختی: {{ final_amount|default:total }} تومان</p>
+            <a href="{% url 'store:home' %}" class="btn" style="display:inline-block; margin-top:15px; padding:8px 20px; background:#0077cc; color:#fff; text-decoration:none; border-radius:6px;">بازگشت به صفحه اصلی</a>
+        </div>
+    {% else %}
+        <div style="background:#fff; padding:25px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+            <h2>💳 پرداخت آنلاین</h2>
+            <p style="color:#666; margin-bottom:20px;">برای تکمیل خرید، روش پرداخت را انتخاب کنید.</p>
+
+            {% if error %}
+                <div style="background:#f8d7da; color:#721c24; padding:10px; border-radius:6px; margin-bottom:15px;">{{ error }}</div>
+            {% endif %}
+
+            <!-- ===== نمایش قیمت‌ها ===== -->
+            <div style="background:#f8f9fa; padding:15px; border-radius:8px; margin-bottom:20px; text-align:right;">
+                <div style="display:flex; justify-content:space-between; padding:5px 0;">
+                    <span>مبلغ کل سبد خرید:</span>
+                    <span id="totalAmount">{{ total }} تومان</span>
+                </div>
+                {% if discount > 0 %}
+                    <div style="display:flex; justify-content:space-between; padding:5px 0; color:#22a958;">
+                        <span>🎟️ تخفیف اعمال‌شده:</span>
+                        <span id="discountAmount">- {{ discount }} تومان</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:5px 0; font-weight:bold; font-size:1.1rem; border-top:2px solid #ddd; margin-top:5px; padding-top:10px;">
+                        <span>مبلغ قابل پرداخت:</span>
+                        <span id="finalAmount" style="color:#ef4056;">{{ final_amount }} تومان</span>
+                    </div>
+                {% else %}
+                    <div style="display:flex; justify-content:space-between; padding:5px 0; font-weight:bold; font-size:1.1rem; border-top:2px solid #ddd; margin-top:5px; padding-top:10px;">
+                        <span>مبلغ قابل پرداخت:</span>
+                        <span id="finalAmount" style="color:#ef4056;">{{ total }} تومان</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <form method="post" style="text-align:right;" id="paymentForm">
+                {% csrf_token %}
+
+                <!-- ===== انتخاب روش پرداخت ===== -->
+                <div style="margin-bottom:20px; text-align:center;">
+                    <label style="font-weight:bold; display:block; margin-bottom:10px;">روش پرداخت:</label>
+                    
+                    <div style="display:flex; gap:20px; justify-content:center; flex-wrap:wrap;">
+                        <!-- گزینه کیف پول -->
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; background:#f8f9fa; padding:10px 20px; border-radius:8px; border:1px solid #ddd;">
+                            <input type="radio" name="payment_method" value="wallet" id="method_wallet" 
+                                   {% if not wallet_has_enough %}disabled{% endif %}>
+                            <span>💰 کیف پول
+                                <span style="display:block; font-size:0.8rem; color:#666;">
+                                    موجودی: {{ available_balance|default:0 }} تومان
+                                    {% if not wallet_has_enough %}<br><span style="color:#ef4056;">(موجودی ناکافی)</span>{% endif %}
+                                </span>
+                            </span>
+                        </label>
+                        
+                        <!-- گزینه کارت -->
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; background:#f8f9fa; padding:10px 20px; border-radius:8px; border:1px solid #ddd;">
+                            <input type="radio" name="payment_method" value="card" id="method_card" checked>
+                            <span>💳 کارت بانکی</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- ===== بخش کد تخفیف ===== -->
+                <div id="couponSection" style="margin:20px 0; padding:15px; background:#f8f9fa; border-radius:8px; border:1px dashed #ddd;">
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                        <input type="text" id="couponInput" placeholder="کد تخفیف را وارد کنید..." 
+                               style="flex:1; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:0.95rem; text-align:center; direction:ltr;">
+                        <button type="button" id="applyCouponBtn" class="btn" style="background:#f39c12; padding:10px 20px; border:none; border-radius:6px; color:#fff; cursor:pointer;">اعمال</button>
+                        <button type="button" id="removeCouponBtn" class="btn" style="background:#ef4056; padding:10px 20px; border:none; border-radius:6px; color:#fff; cursor:pointer; display:none;">حذف</button>
+                    </div>
+                    <div id="couponMessage" style="margin-top:10px; font-size:0.9rem;"></div>
+                    <div id="couponDiscount" style="margin-top:10px; font-weight:bold; color:#22a958; display:none;"></div>
+                </div>
+
+                <!-- ===== بخش شماره کارت (فقط در صورت انتخاب کارت نمایش داده می‌شود) ===== -->
+                <div id="cardSection" style="display:block;">
+                    <div class="form-group">
+                        <label>شماره کارت (۱۶ رقمی)</label>
+                        <input type="text" id="cardDisplay" placeholder="____ ____ ____ ____" 
+                               style="text-align:center; letter-spacing:2px; font-size:1.1rem; direction:ltr; width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; background:#f9f9f9;">
+                        <input type="hidden" name="card_number" id="cardHidden">
+                        <span id="cardError" style="color:#ef4056; font-size:0.8rem; display:none;">شماره کارت باید ۱۶ رقم باشد.</span>
+                    </div>
+                </div>
+
+                <!-- ===== پیام موجودی ناکافی برای کیف پول ===== -->
+                <div id="walletInsufficient" style="display:none; background:#fff3cd; color:#856404; padding:10px; border-radius:6px; margin-bottom:15px;">
+                    موجودی کیف پول شما کافی نیست! لطفاً روش کارت را انتخاب کنید.
+                </div>
+
+                <button type="submit" class="btn" style="width:100%; padding:10px; font-size:1rem; background:#ef4056; color:#fff; border:none; border-radius:8px; cursor:pointer; font-weight:bold;" id="submitBtn">پرداخت نهایی</button>
+            </form>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    (function() {
+        // ====== المنت‌های موجود ======
+        const display = document.getElementById('cardDisplay');
+        const hidden = document.getElementById('cardHidden');
+        const error = document.getElementById('cardError');
+        const methodWallet = document.getElementById('method_wallet');
+        const methodCard = document.getElementById('method_card');
+        const cardSection = document.getElementById('cardSection');
+        const walletInsufficient = document.getElementById('walletInsufficient');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // ====== المنت‌های کد تخفیف و قیمت ======
+        const couponInput = document.getElementById('couponInput');
+        const applyCouponBtn = document.getElementById('applyCouponBtn');
+        const removeCouponBtn = document.getElementById('removeCouponBtn');
+        const couponMessage = document.getElementById('couponMessage');
+        const couponDiscount = document.getElementById('couponDiscount');
+        const totalAmountEl = document.getElementById('totalAmount');
+        const finalAmountEl = document.getElementById('finalAmount');
+        const discountAmountEl = document.getElementById('discountAmount');
+
+        // ====== ذخیره اعداد خام ======
+        let rawDigits = '';
+
+        // ====== تولید نمایش ماسک‌شده ======
+        function getMaskedDisplay(raw) {
+            let padded = raw.padEnd(16, '*');
+            let chars = padded.split('');
+            for (let i = 0; i < 16; i++) {
+                if (i < 4 || i >= 12) {
+                    if (i < raw.length) {
+                        chars[i] = raw[i];
+                    } else {
+                        chars[i] = '*';
+                    }
+                } else {
+                    chars[i] = '*';
+                }
+            }
+            let result = '';
+            for (let i = 0; i < 16; i += 4) {
+                result += chars.slice(i, i + 4).join('') + ' ';
+            }
+            return result.trim();
+        }
+
+        function updateDisplay() {
+            let masked = getMaskedDisplay(rawDigits);
+            display.value = masked;
+            hidden.value = rawDigits;
+            display.setSelectionRange(masked.length, masked.length);
+        }
+
+        // ====== کنترل نمایش بخش کارت بر اساس انتخاب روش ======
+        function toggleSections() {
+            if (methodWallet.checked) {
+                cardSection.style.display = 'none';
+                walletInsufficient.style.display = 'none';
+                {% if not wallet_has_enough %}
+                    walletInsufficient.style.display = 'block';
+                    submitBtn.disabled = true;
+                    submitBtn.style.opacity = '0.6';
+                    submitBtn.textContent = 'موجودی کافی نیست';
+                {% else %}
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                    submitBtn.textContent = 'پرداخت با کیف پول';
+                {% endif %}
+            } else {
+                cardSection.style.display = 'block';
+                walletInsufficient.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.textContent = 'پرداخت با کارت';
+            }
+        }
+
+        // ====== رویدادهای انتخاب روش پرداخت ======
+        methodWallet.addEventListener('change', toggleSections);
+        methodCard.addEventListener('change', toggleSections);
+
+        // ====== ورودی شماره کارت ======
+        display.addEventListener('keydown', function(e) {
+            const controlKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'];
+            if (controlKeys.includes(e.key)) {
+                if (e.key === 'Backspace') {
+                    e.preventDefault();
+                    if (rawDigits.length > 0) {
+                        rawDigits = rawDigits.slice(0, -1);
+                        updateDisplay();
+                    }
+                    return;
+                }
+                return;
+            }
+            if (!/^[0-9]$/.test(e.key)) {
+                e.preventDefault();
+                return;
+            }
+            if (rawDigits.length >= 16) {
+                e.preventDefault();
+                return;
+            }
+            e.preventDefault();
+            rawDigits += e.key;
+            updateDisplay();
+        });
+
+        display.addEventListener('click', function() {
+            this.setSelectionRange(this.value.length, this.value.length);
+        });
+
+        // ====== اعتبارسنجی قبل از ارسال ======
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            if (methodWallet.checked) {
+                {% if not wallet_has_enough %}
+                    e.preventDefault();
+                    walletInsufficient.style.display = 'block';
+                    return false;
+                {% else %}
+                    return true;
+                {% endif %}
+            }
+
+            if (rawDigits.length !== 16) {
+                e.preventDefault();
+                error.style.display = 'block';
+                display.focus();
+                return false;
+            }
+            error.style.display = 'none';
+            return true;
+        });
+        // ====== مدیریت کد تخفیف ======
+        
+        // تابع به‌روزرسانی قیمت‌ها
+        function updatePrices(total, discount, final) {
+            if (totalAmountEl) totalAmountEl.textContent = total + ' تومان';
+            if (discountAmountEl) {
+                if (discount > 0) {
+                    discountAmountEl.textContent = '- ' + discount + ' تومان';
+                    discountAmountEl.parentElement.style.display = 'flex';
+                } else {
+                    discountAmountEl.parentElement.style.display = 'none';
+                }
+            }
+            if (finalAmountEl) finalAmountEl.textContent = final + ' تومان';
+        }
+
+        applyCouponBtn.addEventListener('click', function() {
+            const code = couponInput.value.trim().toUpperCase();
+            if (!code) {
+                couponMessage.innerHTML = '<span style="color:#ef4056;">لطفاً کد تخفیف را وارد کنید.</span>';
+                return;
+            }
+
+            fetch("{% url 'store:apply_coupon' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                },
+                body: 'coupon_code=' + encodeURIComponent(code)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    couponMessage.innerHTML = '<span style="color:#22a958;">✅ کد تخفیف اعمال شد!</span>';
+                    couponDiscount.style.display = 'block';
+                    couponDiscount.innerHTML = '🎟️ تخفیف: ' + data.discount_amount + ' تومان';
+                    removeCouponBtn.style.display = 'inline-block';
+                    applyCouponBtn.style.display = 'none';
+                    couponInput.disabled = true;
+                    
+                    // به‌روزرسانی قیمت‌ها
+                    const total = parseInt('{{ total }}');
+                    const discount = data.discount_amount;
+                    const final = total - discount;
+                    updatePrices(total, discount, final);
+                } else {
+                    couponMessage.innerHTML = '<span style="color:#ef4056;">❌ ' + data.error + '</span>';
+                }
+            })
+            .catch(error => {
+                couponMessage.innerHTML = '<span style="color:#ef4056;">❌ خطا در ارتباط با سرور</span>';
+            });
+        });
+
+        removeCouponBtn.addEventListener('click', function() {
+            fetch("{% url 'store:remove_coupon' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    couponInput.value = '';
+                    couponInput.disabled = false;
+                    couponMessage.innerHTML = '';
+                    couponDiscount.style.display = 'none';
+                    removeCouponBtn.style.display = 'none';
+                    applyCouponBtn.style.display = 'inline-block';
+                    
+                    // بازگرداندن قیمت اصلی
+                    const total = parseInt('{{ total }}');
+                    updatePrices(total, 0, total);
+                }
+            });
+        });
+
+        // ====== مقداردهی اولیه ======
+        toggleSections();
+        updateDisplay();
+        // قیمت اولیه را تنظیم کن
+        const initialTotal = parseInt('{{ total }}');
+        const initialDiscount = parseInt('{{ discount|default:0 }}');
+        const initialFinal = parseInt('{{ final_amount|default:total }}');
+        updatePrices(initialTotal, initialDiscount, initialFinal);
+    })();
+</script>
+
+{% endblock %}

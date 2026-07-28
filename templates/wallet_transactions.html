@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}تاریخچه تراکنش‌ها | دیجی‌کالا{% endblock %}
+
+{% block content %}
+<div style="max-width:900px; margin:0 auto; text-align:right; direction:rtl;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="color:#333;">📜 تاریخچه تراکنش‌ها</h2>
+        <a href="{% url 'store:wallet' %}" class="btn" style="background:#0077cc;">⬅ بازگشت</a>
+    </div>
+
+    <!-- موجودی -->
+    <div style="background:linear-gradient(135deg, #ef4056, #c0392b); color:#fff; padding:20px; border-radius:12px; margin-bottom:20px; text-align:center;">
+        <p style="font-size:0.9rem; opacity:0.8;">موجودی قابل استفاده</p>
+        <p style="font-size:2rem; font-weight:bold;">{{ available_balance|default:0 }} تومان</p>
+    </div>
+
+    <!-- فیلتر -->
+    <form method="GET" style="margin-bottom:20px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; background:#fff; padding:15px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        <label style="font-weight:bold;">فیلتر بر اساس نوع:</label>
+        <select name="type" style="padding:8px 12px; border:1px solid #ddd; border-radius:6px;">
+            <option value="">همه</option>
+            <option value="DEPOSIT" {% if filter_type == 'DEPOSIT' %}selected{% endif %}>شارژ</option>
+            <option value="WITHDRAW" {% if filter_type == 'WITHDRAW' %}selected{% endif %}>برداشت</option>
+            <option value="PAYMENT" {% if filter_type == 'PAYMENT' %}selected{% endif %}>پرداخت</option>
+            <option value="REFUND" {% if filter_type == 'REFUND' %}selected{% endif %}>بازگشت وجه</option>
+            <option value="SELLER_EARNING" {% if filter_type == 'SELLER_EARNING' %}selected{% endif %}>درآمد فروشنده</option>
+            <option value="SELLER_WITHDRAW" {% if filter_type == 'SELLER_WITHDRAW' %}selected{% endif %}>برداشت فروشنده</option>
+        </select>
+        <button type="submit" class="btn" style="background:#0077cc; padding:8px 20px; border:none; border-radius:6px; color:#fff; cursor:pointer;">اعمال فیلتر</button>
+    </form>
+
+    <!-- لیست تراکنش‌ها -->
+    <div style="background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; text-align:right;">
+            <thead style="background:#f8f9fa;">
+                <tr>
+                    <th style="padding:12px;">تاریخ</th>
+                    <th style="padding:12px;">نوع</th>
+                    <th style="padding:12px;">مبلغ</th>
+                    <th style="padding:12px;">موجودی پس از</th>
+                    <th style="padding:12px;">توضیحات</th>
+                    <th style="padding:12px;">وضعیت</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trans in transactions %}
+                    <tr style="border-bottom:1px solid #eee;">
+                        <td style="padding:12px; font-size:0.85rem;">{{ trans.created_at|date:"Y/m/d H:i" }}</td>
+                        <td style="padding:12px;">{{ trans.get_transaction_type_display }}</td>
+                        <td style="padding:12px; 
+                            {% if trans.transaction_type in 'DEPOSIT,SELLER_EARNING,REFUND' %}color:#22a958;
+                            {% else %}color:#ef4056;{% endif %} font-weight:bold;">
+                            {% if trans.transaction_type in 'DEPOSIT,SELLER_EARNING,REFUND' %}+{% else %}-{% endif %}
+                            {{ trans.amount }} تومان
+                        </td>
+                        <td style="padding:12px;">{{ trans.balance_after }} تومان</td>
+                        <td style="padding:12px; font-size:0.85rem; max-width:200px;">{{ trans.description|default:"-" }}</td>
+                        <td style="padding:12px;">
+                            <span style="padding:3px 10px; border-radius:20px; font-size:0.8rem;
+                                {% if trans.status == 'COMPLETED' %}background:#d4edda; color:#155724;
+                                {% elif trans.status == 'PENDING' %}background:#fff3cd; color:#856404;
+                                {% else %}background:#f8d7da; color:#721c24;{% endif %}">
+                                {{ trans.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="6" style="padding:40px; text-align:center; color:#666;">هیچ تراکنشی یافت نشد.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

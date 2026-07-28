@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}ورود | دیجی‌کالا{% endblock %}
+
+{% block content %}
+<div style="max-width:400px; margin:40px auto; background:#fff; padding:25px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05); text-align:right;">
+    <h2 style="text-align:center; color:#333;">🔐 ورود به دیجی‌کالا</h2>
+
+    <form method="post" class="auth-form" style="box-shadow:none; padding:0; margin-top:20px;">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        
+        <div class="form-group">
+            <label for="id_username">نام کاربری</label>
+            {{ form.username }}
+        </div>
+        <div class="form-group">
+            <label for="id_password">رمز عبور</label>
+            {{ form.password }}
+        </div>
+
+        <button type="submit" class="btn" style="width:100%; padding:10px; font-size:1rem; background:#ef4056; color:#fff; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">ورود</button>
+
+        <p style="text-align:center; margin-top:15px; font-size:0.9rem; color:#666;">
+            حساب کاربری ندارید؟ 
+            <a href="{% url 'account:signup' %}" style="color:#0077cc; text-decoration:none; font-weight:bold;">ثبت‌نام</a>
+        </p>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}پنل کاربری | دیجی‌کالا{% endblock %}
+
+{% block content %}
+<div style="text-align:right; max-width:500px; margin:0 auto;">
+    <h2>👤 پنل کاربری</h2>
+    <div style="background:#fff; padding:20px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        <p><strong>نام کاربری:</strong> {{ user.username }}</p>
+        <p><strong>نقش:</strong> 
+            {% if user.role == 'CUSTOMER' %}مشتری
+            {% elif user.role == 'SELLER' %}فروشنده
+            {% elif user.role == 'ADMIN' %}ادمین
+            {% endif %}
+        </p>
+        <p><strong>شماره تلفن:</strong> {{ user.phone_number|default:"ثبت نشده" }}</p>
+        <p><strong>ایمیل:</strong> {{ user.email|default:"ثبت نشده" }}</p>
+        <hr style="margin:20px 0;">
+        <p><strong>💰 موجودی کیف پول:</strong> <span style="color:#ef4056; font-weight:bold; font-size:1.2rem;">{{ user.available_balance|default:0 }} تومان</span></p>
+        <hr style="margin:20px 0;">
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a href="{% url 'store:cart' %}" class="btn" style="background:#0077cc; color:#fff; text-decoration:none; padding:8px 15px; border-radius:6px;">🛒 سبد خرید</a>
+            <a href="{% url 'store:payment' %}" class="btn" style="background:#22a958; color:#fff; text-decoration:none; padding:8px 15px; border-radius:6px;">💳 پرداخت</a>
+            <a href="{% url 'store:wallet' %}" class="btn" style="background:#f39c12; color:#fff; text-decoration:none; padding:8px 15px; border-radius:6px;">💰 کیف پول</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

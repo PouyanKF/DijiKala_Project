@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}مدیریت محصولات | دیجی‌کالا{% endblock %}
+
+{% block content %}
+<div style="max-width:1100px; margin:0 auto; text-align:right; direction:rtl;">
+
+    <!-- هدر -->
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:20px;">
+        <div>
+            <h2 style="color:#333; margin:0;">📦 مدیریت محصولات</h2>
+            <p style="color:#666; font-size:0.9rem; margin-top:5px;">
+                {{ total_products }} محصول • مجموع موجودی: {{ total_stock }} • میانگین قیمت: {{ avg_price|floatformat:0 }} تومان
+            </p>
+        </div>
+        <a href="{% url 'store:add_product' %}" class="btn" style="background:#22a958; padding:10px 20px;">
+            ➕ افزودن محصول جدید
+        </a>
+    </div>
+
+    <!-- فیلتر و جستجو -->
+    <div style="background:#fff; padding:15px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); margin-bottom:20px;">
+        <form method="GET" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <input type="text" name="search" placeholder="جستجوی محصول..." value="{{ search_query|default:'' }}" 
+                   style="flex:1; min-width:150px; padding:8px 12px; border:1px solid #ddd; border-radius:6px;">
+            
+            <select name="category" style="padding:8px 12px; border:1px solid #ddd; border-radius:6px;">
+                <option value="">همه دسته‌بندی‌ها</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if category_id|add:0 == cat.id %}selected{% endif %}>
+                        {{ cat.title }}
+                    </option>
+                {% endfor %}
+            </select>
+            
+            <select name="stock" style="padding:8px 12px; border:1px solid #ddd; border-radius:6px;">
+                <option value="">همه</option>
+                <option value="in_stock" {% if stock_filter == 'in_stock' %}selected{% endif %}>موجود</option>
+                <option value="out_of_stock" {% if stock_filter == 'out_of_stock' %}selected{% endif %}>ناموجود</option>
+            </select>
+            
+            <button type="submit" class="btn" style="background:#0077cc; padding:8px 20px;">فیلتر</button>
+            <a href="{% url 'store:seller_products' %}" class="btn" style="background:#666; padding:8px 20px;">حذف فیلتر</a>
+        </form>
+    </div>
+
+    <!-- لیست محصولات -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:20px;">
+        {% for product in products %}
+            <div style="background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); overflow:hidden; border-right:4px solid {% if product.stock > 0 %}#22a958{% else %}#ef4056{% endif %};">
+                
+                <!-- تصویر -->
+                <div style="height:160px; overflow:hidden; background:#f5f5f5;">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.title }}" style="width:100%; height:100%; object-fit:cover;">
+                    {% else %}
+                        <div style="display:flex; align-items:center; justify-content:center; height:100%; color:#aaa;">
+                            <span>بدون تصویر</span>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- اطلاعات -->
+                <div style="padding:15px;">
+                    <div style="display:flex; justify-content:space-between; align-items:start;">
+                        <h3 style="margin:0; font-size:1.05rem; color:#333;">{{ product.title }}</h3>
+                        <span style="font-size:0.75rem; padding:2px 10px; border-radius:20px; 
+                            {% if product.stock > 0 %}background:#d4edda; color:#155724;
+                            {% else %}background:#f8d7da; color:#721c24;{% endif %}">
+                            {% if product.stock > 0 %}موجود{% else %}ناموجود{% endif %}
+                        </span>
+                    </div>
+                    
+                    <p style="color:#666; font-size:0.85rem; margin:8px 0;">{{ product.category.title }}</p>
+                    
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin:8px 0;">
+                        <span style="font-weight:bold; color:#ef4056; font-size:1.1rem;">{{ product.price }} تومان</span>
+                        <span style="font-size:0.85rem; color:#666;">موجودی: {{ product.stock }}</span>
+                    </div>
+                    
+                    <!-- دکمه‌های اقدام -->
+                    <div style="display:flex; gap:5px; flex-wrap:wrap; margin-top:12px;">
+                        <a href="{% url 'store:seller_product_edit' product.id %}" class="btn" style="background:#0077cc; flex:1; text-align:center; padding:6px; font-size:0.85rem;">✏️ ویرایش</a>
+                        <a href="{% url 'store:seller_product_stock' product.id %}" class="btn" style="background:#f39c12; flex:1; text-align:center; padding:6px; font-size:0.85rem;">📦 موجودی</a>
+                        <a href="{% url 'store:seller_product_delete' product.id %}" class="btn" style="background:#ef4056; flex:1; text-align:center; padding:6px; font-size:0.85rem;" onclick="return confirm('آیا از حذف این محصول مطمئن هستید؟')">🗑️ حذف</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div style="grid-column:1/-1; text-align:center; padding:60px; background:#fff; border-radius:12px; color:#666;">
+                <p style="font-size:1.2rem;">هیچ محصولی ثبت نشده است.</p>
+                <a href="{% url 'store:add_product' %}" class="btn" style="display:inline-block; margin-top:15px; background:#22a958;">➕ افزودن اولین محصول</a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

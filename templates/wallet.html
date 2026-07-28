@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}کیف پول | دیجی‌کالا{% endblock %}
+
+{% block content %}
+<div style="max-width:800px; margin:0 auto; text-align:right; direction:rtl;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="color:#333;">💰 کیف پول من</h2>
+        <a href="{% url 'store:wallet_transactions' %}" class="btn" style="background:#0077cc;">📜 تاریخچه تراکنش‌ها</a>
+    </div>
+
+    <!-- کارت موجودی -->
+    <div style="background:linear-gradient(135deg, #ef4056, #c0392b); color:#fff; padding:30px; border-radius:12px; margin-bottom:25px; text-align:center;">
+        <p style="font-size:0.9rem; opacity:0.8;">موجودی قابل استفاده</p>
+        <p style="font-size:2.5rem; font-weight:bold; margin:10px 0;">{{ available_balance|default:0 }} تومان</p>
+        <p style="font-size:0.8rem; opacity:0.7;">
+            موجودی کل: {{ user.balance|default:0 }} | مسدود: {{ user.balance_hold|default:0 }}
+        </p>
+    </div>
+
+    <!-- دکمه‌های اقدام -->
+    <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:30px;">
+        <button onclick="document.getElementById('depositForm').style.display='block'" 
+                class="btn" style="background:#22a958; flex:1; padding:12px; font-size:1rem; border:none; border-radius:6px; color:#fff; cursor:pointer;">
+            💳 شارژ کیف پول
+        </button>
+        
+        {% if user.role == 'SELLER' or user.is_superuser %}
+            <button onclick="document.getElementById('withdrawForm').style.display='block'" 
+                    class="btn" style="background:#0077cc; flex:1; padding:12px; font-size:1rem; border:none; border-radius:6px; color:#fff; cursor:pointer;">
+                🏦 برداشت از کیف پول
+            </button>
+        {% endif %}
+        
+        <a href="{% url 'store:wallet_transactions' %}" class="btn" style="background:#f39c12; flex:1; padding:12px; font-size:1rem; text-align:center; text-decoration:none; color:#fff; border-radius:6px;">
+            📜 تاریخچه
+        </a>
+    </div>
+
+    <!-- فرم شارژ -->
+    <div id="depositForm" style="display:none; background:#fff; padding:20px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); margin-bottom:20px;">
+        <h4 style="margin-bottom:15px;">💳 شارژ کیف پول</h4>
+        <form method="post" action="{% url 'store:wallet_deposit' %}">
+            {% csrf_token %}
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <input type="number" name="amount" placeholder="مبلغ به تومان" min="1000" step="1000" 
+                       style="flex:1; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:1rem;" required>
+                <button type="submit" class="btn" style="background:#22a958; padding:10px 25px; border:none; border-radius:6px; color:#fff; cursor:pointer;">شارژ</button>
+                <button type="button" onclick="this.closest('div').style.display='none'" 
+                        style="background:none; border:none; color:#ef4056; cursor:pointer; font-size:1.2rem;">❌</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- فرم برداشت -->
+    <div id="withdrawForm" style="display:none; background:#fff; padding:20px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); margin-bottom:20px;">
+        <h4 style="margin-bottom:15px;">🏦 برداشت از کیف پول</h4>
+        <p style="color:#666; font-size:0.9rem; margin-bottom:10px;">موجودی قابل برداشت: {{ available_balance|default:0 }} تومان</p>
+        <form method="post" action="{% url 'store:seller_withdraw' %}">
+            {% csrf_token %}
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <input type="number" name="amount" placeholder="مبلغ به تومان" min="1000" step="1000" max="{{ available_balance }}"
+                       style="flex:1; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:1rem;" required>
+                <button type="submit" class="btn" style="background:#0077cc; padding:10px 25px; border:none; border-radius:6px; color:#fff; cursor:pointer;">برداشت</button>
+                <button type="button" onclick="this.closest('div').style.display='none'" 
+                        style="background:none; border:none; color:#ef4056; cursor:pointer; font-size:1.2rem;">❌</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- آخرین تراکنش‌ها -->
+    <h3 style="margin:30px 0 15px;">📜 آخرین تراکنش‌ها</h3>
+    <div style="background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); overflow:hidden;">
+        {% if transactions %}
+            <table style="width:100%; border-collapse:collapse; text-align:right;">
+                <thead style="background:#f8f9fa;">
+                    <tr>
+                        <th style="padding:12px;">تاریخ</th>
+                        <th style="padding:12px;">نوع</th>
+                        <th style="padding:12px;">مبلغ</th>
+                        <th style="padding:12px;">وضعیت</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for trans in transactions %}
+                        <tr style="border-bottom:1px solid #eee;">
+                            <td style="padding:12px;">{{ trans.created_at|date:"Y/m/d H:i" }}</td>
+                            <td style="padding:12px;">{{ trans.get_transaction_type_display }}</td>
+                            <td style="padding:12px; 
+                                {% if trans.transaction_type in 'DEPOSIT,SELLER_EARNING,REFUND' %}color:#22a958;
+                                {% else %}color:#ef4056;{% endif %} font-weight:bold;">
+                                {% if trans.transaction_type in 'DEPOSIT,SELLER_EARNING,REFUND' %}+{% else %}-{% endif %}
+                                {{ trans.amount }} تومان
+                            </td>
+                            <td style="padding:12px;">
+                                <span style="padding:3px 10px; border-radius:20px; font-size:0.8rem;
+                                    {% if trans.status == 'COMPLETED' %}background:#d4edda; color:#155724;
+                                    {% elif trans.status == 'PENDING' %}background:#fff3cd; color:#856404;
+                                    {% else %}background:#f8d7da; color:#721c24;{% endif %}">
+                                    {{ trans.get_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4" style="padding:30px; text-align:center; color:#666;">هیچ تراکنشی ثبت نشده است.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div style="padding:30px; text-align:center; color:#666;">هیچ تراکنشی ثبت نشده است.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}ثبت‌نام | دیجی‌کالا{% endblock %}
+
+{% block content %}
+<div style="max-width:450px; margin:30px auto; background:#fff; padding:25px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05); text-align:right;">
+    <h2 style="text-align:center; color:#333; margin-bottom:20px;">🧾 ثبت‌نام در دیجی‌کالا</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if form.errors %}
+            <div style="background:#fff0f1; color:#ef4056; padding:10px; border-radius:6px; margin-bottom:15px; font-size:0.9rem;">
+                لطفاً خطاهای فرم را اصلاح کنید.
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            <div class="form-group">
+                <label>{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <small style="display:block; color:#999; margin-top:3px; font-size:0.8rem;">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <span style="color:#ef4056; font-size:0.8rem; display:block;">{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="btn" style="width:100%; padding:10px; font-size:1.1rem; background:#ef4056; color:#fff; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">ثبت‌نام</button>
+
+        <p style="text-align:center; margin-top:15px; font-size:0.9rem; color:#666;">
+            قبلاً ثبت‌نام کرده‌اید؟ <a href="{% url 'login' %}" style="color:#0077cc; text-decoration:none; font-weight:bold;">وارد شوید</a>
+        </p>
+    </form>
+</div>
+{% endblock %}

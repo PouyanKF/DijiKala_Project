@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}افزودن محصول | دیجی‌کالا{% endblock %}
+
+{% block content %}
+<div style="max-width:600px; margin:0 auto; text-align:right;">
+    <h2 style="color:#333; margin-bottom:20px;">📦 افزودن محصول جدید</h2>
+
+    <div style="background:#fff; padding:25px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>انتخاب فروشگاه</label>
+                <select name="store" required>
+                    {% for store in stores %}
+                        <option value="{{ store.id }}">{{ store.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>دسته‌بندی</label>
+                <select name="category" required>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>عنوان محصول</label>
+                <input type="text" name="title" placeholder="مثلاً: لپ‌تاپ ایسوس" required>
+            </div>
+
+            <div class="form-group">
+                <label>تصویر محصول</label>
+                <input type="file" name="image" accept="image/*">
+            </div>
+
+            <div class="form-group">
+                <label>قیمت (تومان)</label>
+                <input type="number" name="price" placeholder="مثلاً: 25000000" required>
+            </div>
+
+            <div class="form-group">
+                <label>موجودی</label>
+                <input type="number" name="stock" placeholder="مثلاً: 10" required>
+            </div>
+
+            <div class="form-group">
+                <label>توضیحات</label>
+                <textarea name="description" placeholder="توضیحات محصول..." style="resize:vertical; height:100px;"></textarea>
+            </div>
+
+            <button type="submit" class="btn" style="width:100%; padding:10px; background:#22a958; color:#fff; border:none; border-radius:6px; font-weight:bold; font-size:1rem;">✅ ثبت محصول</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

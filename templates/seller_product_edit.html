@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }} | دیجی‌کالا{% endblock %}
+
+{% block content %}
+<div style="max-width:600px; margin:0 auto; text-align:right; direction:rtl;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="color:#333;">{{ title }}</h2>
+        <a href="{% url 'store:seller_products' %}" class="btn" style="background:#0077cc;">⬅ بازگشت</a>
+    </div>
+
+    <div style="background:#fff; padding:25px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label style="display:block; font-weight:600; margin-bottom:5px;">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small style="color:#999; font-size:0.8rem; display:block;">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <span style="color:#ef4056; font-size:0.8rem; display:block;">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button type="submit" class="btn" style="background:#22a958; flex:1; padding:10px; font-size:1rem;">
+                    💾 ذخیره تغییرات
+                </button>
+                <a href="{% url 'store:seller_products' %}" class="btn" style="background:#666; flex:1; text-align:center; padding:10px;">
+                    لغو
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

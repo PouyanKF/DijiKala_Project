@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }} | دیجی‌کالا{% endblock %}
+
+{% block content %}
+<div style="max-width:600px; margin:0 auto; text-align:right; direction:rtl;">
+    <h2 style="color:#333; margin-bottom:20px;">{{ title }}</h2>
+    <div style="background:#fff; padding:25px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label style="display:block; font-weight:600; margin-bottom:5px;">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small style="color:#999; font-size:0.8rem;">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <span style="color:#ef4056; font-size:0.8rem;">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn" style="width:100%; padding:10px; background:#22a958; font-size:1rem;">✅ ذخیره کد تخفیف</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

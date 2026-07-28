@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }} | دیجی‌کالا{% endblock %}
+
+{% block content %}
+<div style="max-width:500px; margin:0 auto; text-align:right; direction:rtl;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="color:#333;">{{ title }}</h2>
+        <a href="{% url 'store:seller_products' %}" class="btn" style="background:#0077cc;">⬅ بازگشت</a>
+    </div>
+
+    <div style="background:#fff; padding:25px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        <div style="text-align:center; margin-bottom:20px;">
+            <h3 style="margin:0;">{{ product.title }}</h3>
+            <p style="color:#666;">موجودی فعلی: <strong style="color:#ef4056; font-size:1.2rem;">{{ product.stock }}</strong></p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group" style="margin-bottom:20px;">
+                <label style="display:block; font-weight:600; margin-bottom:5px;">تعداد:</label>
+                <input type="number" name="quantity" min="1" value="1" required
+                       style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:1rem;">
+            </div>
+            
+            <div style="display:flex; gap:10px;">
+                <button type="submit" name="action" value="increase" class="btn" style="background:#22a958; flex:1; padding:10px; font-size:1rem;">
+                    ➕ افزایش موجودی
+                </button>
+                <button type="submit" name="action" value="decrease" class="btn" style="background:#ef4056; flex:1; padding:10px; font-size:1rem;">
+                    ➖ کاهش موجودی
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

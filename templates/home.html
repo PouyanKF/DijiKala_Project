@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}صفحه اصلی | دیجی‌کالا{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom:20px; color:#333; text-align:right;">🛒 جدیدترین محصولات بازارچه</h2>
+
+<div class="card-grid">
+    {% for product in products %}
+        <div class="card" style="display:flex; flex-direction:column; justify-content:space-between; text-align:right;">
+            <div>
+                <!-- اصلاح: store:product_detail -->
+                <a href="{% url 'store:product_detail' product.id %}" style="text-decoration:none; color:inherit;">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.title }}" style="width:100%; height:180px; object-fit:cover; border-radius:8px;">
+                    {% else %}
+                        <div style="width:100%; height:180px; background:#f5f5f5; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#aaa;">بدون تصویر</div>
+                    {% endif %}
+                    <h3 style="margin:10px 0 5px;">{{ product.title }}</h3>
+                </a>
+                <p style="color:#666; font-size:0.85rem; margin-bottom:8px;">{{ product.description|truncatewords:10 }}</p>
+                <p style="font-size:0.8rem; color:#888;">🏷️ {{ product.category.title }} | 👤 {{ product.seller.username }}</p>
+            </div>
+
+            <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin:10px 0;">
+                    <span style="font-weight:bold; color:#ef4056; font-size:1.1rem;">{{ product.price }} تومان</span>
+                    {% if product.stock > 0 %}
+                        <span style="font-size:0.8rem; color:#22a958; background:#e8f7ee; padding:3px 8px; border-radius:4px;">موجود ({{ product.stock }})</span>
+                    {% else %}
+                        <span style="font-size:0.8rem; color:#ef4056; background:#fff0f1; padding:3px 8px; border-radius:4px;">اتمام موجودی</span>
+                    {% endif %}
+                </div>
+
+                {% if user.is_authenticated %}
+                    {% if user.is_superuser or user.role == 'ADMIN' or product.seller == user %}
+                        <!-- اصلاح: store:delete_product -->
+                        <a href="{% url 'store:delete_product' product.id %}" class="btn" style="background:#ef4056; width:100%; display:block; text-align:center; padding:8px; border-radius:6px; color:#fff; text-decoration:none;">❌ حذف</a>
+                    {% else %}
+                        {% if product.stock > 0 %}
+                            <!-- اصلاح: store:add_to_cart -->
+                            <a href="{% url 'store:add_to_cart' product.id %}" class="btn" style="background:#0077cc; width:100%; display:block; text-align:center; padding:8px; border-radius:6px; color:#fff; text-decoration:none;">➕ افزودن به سبد خرید</a>
+                        {% else %}
+                            <button class="btn" disabled style="background:#ccc; width:100%; padding:8px; border-radius:6px; color:#666; cursor:not-allowed; border:none;">ناموجود</button>
+                        {% endif %}
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'login' %}" style="display:block; text-align:center; color:#0077cc; font-weight:bold; text-decoration:none;">برای خرید وارد شوید</a>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <div style="grid-column:1/-1; text-align:center; padding:40px; color:#666; background:#fff; border-radius:12px;">هیچ محصولی یافت نشد!</div>
+    {% endfor %}
+</div>
+{% endblock %}
